@@ -33,6 +33,7 @@ export default function Home() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [startBusy, setStartBusy] = useState(false);
+  const [endBusy, setEndBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [noticeMessage, setNoticeMessage] = useState("");
   const [sessionError, setSessionError] = useState("");
@@ -167,6 +168,40 @@ export default function Home() {
     }
 
     setStartBusy(false);
+  }
+
+  async function handleEndSession() {
+    if (!session || !activeRecord) {
+      return;
+    }
+
+    setEndBusy(true);
+    setSessionError("");
+
+    const { data, error } = await supabase
+      .from("time_records")
+      .update({ ended_at: new Date().toISOString() })
+      .eq("id", activeRecord.id)
+      .eq("user_id", session.user.id)
+      .is("ended_at", null)
+      .select("id, started_at, ended_at")
+      .maybeSingle();
+
+    if (error) {
+      setSessionError(error.message);
+    } else if (!data) {
+      setSessionError(
+        "This Session could not be ended. Refresh the page and try again.",
+      );
+    } else {
+      setRecords((currentRecords) =>
+        currentRecords.map((record) =>
+          record.id === data.id ? data : record,
+        ),
+      );
+    }
+
+    setEndBusy(false);
   }
 
   const activeRecord =
@@ -318,19 +353,26 @@ export default function Home() {
             </p>
           )}
 
-          <Button
-            disabled={
-              startBusy ||
-              recordsOwnerId !== session.user.id ||
-              activeRecord !== null
-            }
-            onClick={handleStartSession}
-          >
-            {startBusy ? "Starting…" : "Start Session"}
-          </Button>
+          {activeRecord ? (
+            <Button
+              disabled={endBusy || recordsOwnerId !== session.user.id}
+              onClick={handleEndSession}
+            >
+              {endBusy ? "Ending…" : "End Session"}
+            </Button>
+          ) : (
+            <Button
+              disabled={
+                startBusy || recordsOwnerId !== session.user.id
+              }
+              onClick={handleStartSession}
+            >
+              {startBusy ? "Starting…" : "Start Session"}
+            </Button>
+          )}
           {sessionError && (
             <p className="text-sm text-destructive" role="alert">
-              Could not start the Session: {sessionError}
+              {sessionError}
             </p>
           )}
         </CardContent>
@@ -356,33 +398,51 @@ export default function Home() {
               to work.
             </p>
           ) : (
-            <ul className="flex flex-col divide-y divide-border">
-              {records.map((record) => (
-                <li
-                  className="flex flex-col gap-1 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
-                  key={record.id}
-                >
-                  <span className="font-medium">
-                    {formatDateTime(record.started_at, {
-                      dateStyle: "medium",
-                    })}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDateTime(record.started_at, {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                    {" – "}
-                    {record.ended_at
-                      ? formatDateTime(record.ended_at, {
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[30rem] text-left text-sm">
+                <caption className="sr-only">
+                  Your work date, time in, and time out records
+                </caption>
+                <thead>
+                  <tr className="border-b border-border text-muted-foreground">
+                    <th className="px-3 py-2 font-medium" scope="col">
+                      Work date
+                    </th>
+                    <th className="px-3 py-2 font-medium" scope="col">
+                      Time in
+                    </th>
+                    <th className="px-3 py-2 font-medium" scope="col">
+                      Time out
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {records.map((record) => (
+                    <tr className="border-b border-border last:border-0" key={record.id}>
+                      <td className="px-3 py-3">
+                        {formatDateTime(record.started_at, {
+                          dateStyle: "medium",
+                        })}
+                      </td>
+                      <td className="px-3 py-3">
+                        {formatDateTime(record.started_at, {
                           hour: "numeric",
                           minute: "2-digit",
-                        })
-                      : "In progress"}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                        })}
+                      </td>
+                      <td className="px-3 py-3">
+                        {record.ended_at
+                          ? formatDateTime(record.ended_at, {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })
+                          : "In progress"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
