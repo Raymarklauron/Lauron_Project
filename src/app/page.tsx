@@ -34,9 +34,11 @@ export default function Home() {
   const [authBusy, setAuthBusy] = useState(false);
   const [startBusy, setStartBusy] = useState(false);
   const [endBusy, setEndBusy] = useState(false);
+  const [deletingRecordId, setDeletingRecordId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [noticeMessage, setNoticeMessage] = useState("");
   const [sessionError, setSessionError] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -202,6 +204,49 @@ export default function Home() {
     }
 
     setEndBusy(false);
+  }
+
+  async function handleDeleteRecord(record: TimeRecord) {
+    if (!session) {
+      return;
+    }
+
+    const recordDate = formatDateTime(record.started_at, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+    if (
+      !window.confirm(
+        `Delete the time record that started ${recordDate}? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+
+    setDeletingRecordId(record.id);
+    setDeleteError("");
+
+    const { data, error } = await supabase
+      .from("time_records")
+      .delete()
+      .eq("id", record.id)
+      .eq("user_id", session.user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error) {
+      setDeleteError(error.message);
+    } else if (!data) {
+      setDeleteError(
+        "This record could not be deleted. Refresh the page and try again.",
+      );
+    } else {
+      setRecords((currentRecords) =>
+        currentRecords.filter((currentRecord) => currentRecord.id !== record.id),
+      );
+    }
+
+    setDeletingRecordId(null);
   }
 
   const activeRecord =
@@ -414,11 +459,17 @@ export default function Home() {
                     <th className="px-3 py-2 font-medium" scope="col">
                       Time out
                     </th>
+                    <th className="px-3 py-2 font-medium" scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {records.map((record) => (
-                    <tr className="border-b border-border last:border-0" key={record.id}>
+                    <tr
+                      className="border-b border-border last:border-0"
+                      key={record.id}
+                    >
                       <td className="px-3 py-3">
                         {formatDateTime(record.started_at, {
                           dateStyle: "medium",
@@ -438,11 +489,31 @@ export default function Home() {
                             })
                           : "In progress"}
                       </td>
+                      <td className="px-3 py-3 text-right">
+                        <Button
+                          disabled={
+                            deletingRecordId !== null ||
+                            recordsOwnerId !== session.user.id
+                          }
+                          onClick={() => handleDeleteRecord(record)}
+                          size="sm"
+                          variant="destructive"
+                        >
+                          {deletingRecordId === record.id
+                            ? "Deleting…"
+                            : "Delete"}
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          )}
+          {deleteError && (
+            <p className="mt-4 text-sm text-destructive" role="alert">
+              Could not delete the record: {deleteError}
+            </p>
           )}
         </CardContent>
       </Card>

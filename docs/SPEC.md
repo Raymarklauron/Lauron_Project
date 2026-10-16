@@ -17,14 +17,15 @@ One VA: the project owner, tracking their own work through a personal account.
 5. As a VA, I want a completed Time record to include its work date, start time, and end time, so that I can tell when I worked.
 6. As a VA, I want to see my saved Time records after logging in, so that I can find my records without relying on paper.
 7. As a VA, I want to log out, so that another person using my device cannot access my account.
+8. As a VA, I want to delete one Time record after confirming, so that I can erase an unwanted record.
 
 ## Screens
 - **Sign up / Log in:** Lets the VA create an account or log in with email and password.
-- **Time tracker:** After login, shows “Hello, VA,” a Start action when no Session is active, the active Session's start time and an End action while it is active, a table of the VA's Time records below the controls, and a Log out action.
+- **Time tracker:** After login, shows “Hello, VA,” a Start action when no Session is active, the active Session's start time and an End action while it is active, a table of the VA's Time records below the controls with a Delete action on each row, and a Log out action.
 
 ## Data
 - **`time_records` table:** `id` uniquely identifies a Time record; `user_id` identifies its owning Supabase Auth account; `started_at` stores the Session start date and time; `ended_at` stores the end date and time and is empty while a Session is active.
-- Enable Row Level Security (RLS). Only the authenticated owner of a row may read, create, or update that row, enforced by matching `user_id` to the signed-in account. Signed-out visitors and other accounts may not access it. The app does not need to delete records for this MVP.
+- Enable Row Level Security (RLS). Only the authenticated owner of a row may read, create, update, or delete that row, enforced by matching `user_id` to the signed-in account. Signed-out visitors and other accounts may not access it.
 - Store records in the hosted Supabase project. The date and times are displayed in the VA's local time zone. Do not store a name, work type, client details, or other private work information.
 
 ## Login
@@ -39,9 +40,10 @@ Yes. Use Supabase Auth with email and password. The tracker and records are avai
 - [x] A signed-out visitor cannot read or change Time records, and one account cannot read or change another account's records.
 - [x] The VA can log out, and the tracker is no longer accessible until logging in again.
 - [x] No client information or other personal work details are requested.
+- [ ] The VA can delete one selected Time record after confirming, and it disappears from the table.
 
 ## Out of scope
 - Client details, payroll, reports, or work-type labels.
 - Collecting a name for a personalized greeting.
 - Multiple user roles, teams, or shared Time records.
-- Deleting or editing completed Time records.
+- Editing Time records after they have been saved.
