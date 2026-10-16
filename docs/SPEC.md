@@ -31,14 +31,14 @@ One VA: the project owner, tracking their own work through a personal account.
 Yes. Use Supabase Auth with email and password. The tracker and records are available only after logging in.
 
 ## Done for the demo
-- [ ] On the live URL, the VA can create an account and log in.
-- [ ] The signed-in VA can start a Session and see its start time.
-- [ ] The VA can end the active Session.
-- [ ] Ending a Session saves its start and end date-times to the VA's `time_records`.
-- [ ] The signed-in VA can see their saved Time records after refreshing or logging in again.
-- [ ] A signed-out visitor cannot read or change Time records, and one account cannot read or change another account's records.
-- [ ] The VA can log out, and the tracker is no longer accessible until logging in again.
-- [ ] No client information or other personal work details are requested.
+- [x] On the live URL, the VA can create an account and log in.
+- [x] The signed-in VA can start a Session and see its start time.
+- [x] The VA can end the active Session.
+- [x] Ending a Session saves its start and end date-times to the VA's `time_records`.
+- [x] The signed-in VA can see their saved Time records after refreshing or logging in again.
+- [x] A signed-out visitor cannot read or change Time records, and one account cannot read or change another account's records.
+- [x] The VA can log out, and the tracker is no longer accessible until logging in again.
+- [x] No client information or other personal work details are requested.
 
 ## Out of scope
 - Client details, payroll, reports, or work-type labels.
