@@ -20,7 +20,7 @@ One VA: the project owner, tracking their own work through a personal account.
 
 ## Screens
 - **Sign up / Log in:** Lets the VA create an account or log in with email and password.
-- **Time tracker:** After login, shows “Hello, VA,” a Start action when no Session is active, the active Session's start time and an End action while it is active, the VA's completed Time records, and a Log out action.
+- **Time tracker:** After login, shows “Hello, VA,” a Start action when no Session is active, the active Session's start time and an End action while it is active, a table of the VA's Time records below the controls, and a Log out action.
 
 ## Data
 - **`time_records` table:** `id` uniquely identifies a Time record; `user_id` identifies its owning Supabase Auth account; `started_at` stores the Session start date and time; `ended_at` stores the end date and time and is empty while a Session is active.
