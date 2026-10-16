@@ -4,10 +4,10 @@
 
 **Blocked by:** 02.
 
-**Status:** in progress
+**Status:** done
 
 - [x] The VA can start a Session with one action.
 - [x] The active Session's start time is shown.
 - [x] Refreshing the page keeps the active Session visible.
 - [x] The active Session belongs only to the signed-in VA.
-- [ ] Works on the live URL.
+- [x] Works on the live URL.
