@@ -40,7 +40,7 @@ Yes. Use Supabase Auth with email and password. The tracker and records are avai
 - [x] A signed-out visitor cannot read or change Time records, and one account cannot read or change another account's records.
 - [x] The VA can log out, and the tracker is no longer accessible until logging in again.
 - [x] No client information or other personal work details are requested.
-- [ ] The VA can delete one selected Time record after confirming, and it disappears from the table.
+- [x] The VA can delete one selected Time record after confirming, and it disappears from the table.
 
 ## Out of scope
 - Client details, payroll, reports, or work-type labels.

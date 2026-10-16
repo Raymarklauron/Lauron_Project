@@ -4,10 +4,10 @@
 
 **Blocked by:** 04.
 
-**Status:** in progress
+**Status:** done
 
-- [ ] Each Time record has a Delete action.
-- [ ] The VA must confirm before a selected record is deleted.
-- [ ] Only the signed-in owner can delete their own record.
-- [ ] After deletion, the record disappears from the table and stays deleted after refresh.
-- [ ] Works on the live URL.
+- [x] Each Time record has a Delete action.
+- [x] The VA must confirm before a selected record is deleted.
+- [x] Only the signed-in owner can delete their own record.
+- [x] After deletion, the record disappears from the table and stays deleted after refresh.
+- [x] Works on the live URL.
