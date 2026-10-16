@@ -32,8 +32,10 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
+  const [startBusy, setStartBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [noticeMessage, setNoticeMessage] = useState("");
+  const [sessionError, setSessionError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -142,6 +144,33 @@ export default function Home() {
       setErrorMessage(error.message);
     }
   }
+
+  async function handleStartSession() {
+    if (!session) {
+      return;
+    }
+
+    setStartBusy(true);
+    setSessionError("");
+
+    const { data, error } = await supabase
+      .from("time_records")
+      .insert({ user_id: session.user.id })
+      .select("id, started_at, ended_at")
+      .single();
+
+    if (error) {
+      setSessionError(error.message);
+    } else {
+      setRecords((currentRecords) => [data, ...currentRecords]);
+      setRecordsOwnerId(session.user.id);
+    }
+
+    setStartBusy(false);
+  }
+
+  const activeRecord =
+    records.find((record) => record.ended_at === null) ?? null;
 
   if (authLoading) {
     return (
@@ -264,6 +293,48 @@ export default function Home() {
           {errorMessage}
         </p>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Session</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-start gap-4">
+          {recordsOwnerId !== session.user.id ? (
+            <p className="text-sm text-muted-foreground" role="status">
+              Loading your current Session…
+            </p>
+          ) : activeRecord ? (
+            <p className="text-sm text-muted-foreground">
+              Started at{" "}
+              {formatDateTime(activeRecord.started_at, {
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+              . Your Session is in progress.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Ready to record when you begin work.
+            </p>
+          )}
+
+          <Button
+            disabled={
+              startBusy ||
+              recordsOwnerId !== session.user.id ||
+              activeRecord !== null
+            }
+            onClick={handleStartSession}
+          >
+            {startBusy ? "Starting…" : "Start Session"}
+          </Button>
+          {sessionError && (
+            <p className="text-sm text-destructive" role="alert">
+              Could not start the Session: {sessionError}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
